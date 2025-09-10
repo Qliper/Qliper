@@ -11,7 +11,7 @@ Qliper.tv is a decentralized social media campaign platform that rewards users w
 - **Campaign Management**: Join and participate in various social media campaigns
 - **Hashtag Campaigns**: Post content with campaign-specific hashtags to earn rewards
 - **Real Engagement Tracking**: Advanced algorithms ensure authentic engagement is rewarded
-- **Web3 Integration**: Built on Solana blockchain for transparent and secure transactions
+- **OAuth Authentication**: Secure login with Google and Apple Sign-In
 
 ## How It Works
 
@@ -22,19 +22,22 @@ Qliper.tv is a decentralized social media campaign platform that rewards users w
 
 ## Tech Stack
 
-- **Frontend**: React.js / Next.js
-- **Blockchain**: Solana
-- **APIs**: Social media platform integrations
-- **Database**: PostgreSQL / MongoDB
-- **Authentication**: Web3 wallet integration
+- **Backend**: Node.js with Fastify
+- **Database**: Prisma ORM with PostgreSQL
+- **Authentication**: Google OAuth, Apple Sign-In
+- **Language**: TypeScript
+- **API Documentation**: Swagger/OpenAPI
+- **Social Media APIs**: Platform integrations for TikTok, X, YouTube, Instagram
 
 ## Quick Start
 
 ### Prerequisites
 
 - Node.js 18+
-- Solana wallet (Phantom, Solflare, etc.)
-- Social media accounts on supported platforms
+- PostgreSQL database
+- Google OAuth credentials
+- Apple Developer account (for Apple Sign-In)
+- Social media platform API credentials
 
 ### Installation
 
@@ -49,7 +52,12 @@ cd qliper-tv
 npm install
 
 # Set up environment variables
-cp .env.example .env.local
+cp .env.example .env
+
+# Set up database
+npx prisma generate
+npx prisma db push
+npx prisma db seed
 
 # Start development server
 npm run dev
@@ -58,9 +66,18 @@ npm run dev
 ### Environment Variables
 
 ```env
-# Solana Configuration
-SOLANA_RPC_URL=your_solana_rpc_url
-SOLANA_PROGRAM_ID=your_program_id
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/qliper_db"
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Apple Sign-In
+APPLE_CLIENT_ID=your_apple_client_id
+APPLE_TEAM_ID=your_apple_team_id
+APPLE_KEY_ID=your_apple_key_id
+APPLE_PRIVATE_KEY=your_apple_private_key
 
 # Social Media APIs
 TWITTER_API_KEY=your_twitter_api_key
@@ -69,18 +86,18 @@ YOUTUBE_API_KEY=your_youtube_api_key
 TIKTOK_API_KEY=your_tiktok_api_key
 INSTAGRAM_API_KEY=your_instagram_api_key
 
-# Database
-DATABASE_URL=your_database_url
-
-# JWT Secret
+# App Configuration
 JWT_SECRET=your_jwt_secret
+ENCRYPTION_KEY=your_encryption_key
+API_PORT=3000
+NODE_ENV=development
 ```
 
 ## Usage
 
 ### For Content Creators
 
-1. Connect your Solana wallet
+1. Sign in with Google or Apple ID
 2. Link your social media accounts
 3. Browse available campaigns
 4. Create and post content with campaign hashtags
@@ -88,7 +105,7 @@ JWT_SECRET=your_jwt_secret
 
 ### For Brands/Campaign Creators
 
-1. Create an account and connect wallet
+1. Create an account using Google or Apple Sign-In
 2. Set up new campaigns with specific requirements
 3. Define reward structures and budgets
 4. Monitor campaign performance and ROI
@@ -98,15 +115,41 @@ JWT_SECRET=your_jwt_secret
 
 ```
 qliper-tv/
-├── components/           # Reusable UI components
-├── pages/               # Next.js pages
-├── hooks/               # Custom React hooks
-├── utils/               # Utility functions
-├── lib/                 # External service integrations
-├── contracts/           # Solana program contracts
-├── public/              # Static assets
-├── styles/              # CSS and styling files
-└── tests/               # Test files
+├── app/
+│   ├── configs/           # Application and Swagger configuration
+│   │   ├── app_config.ts
+│   │   └── swagger_config.ts
+│   ├── exceptions/        # Custom exceptions and error codes
+│   │   ├── app_exception.ts
+│   │   └── error_codes.ts
+│   ├── libs/
+│   │   ├── services/      # External service integrations
+│   │   │   └── auth/      # Authentication services
+│   │   │       ├── apple/
+│   │   │       └── google/
+│   │   └── utils/         # Utility functions
+│   │       └── encryption_util.ts
+│   ├── modules/           # Feature modules
+│   │   ├── auth/          # Authentication module
+│   │   │   ├── auth_controller.ts
+│   │   │   ├── auth_route.ts
+│   │   │   ├── auth_schema.ts
+│   │   │   └── auth_service.ts
+│   │   ├── main_controller.ts
+│   │   ├── main_route.ts
+│   │   └── main_schema.ts
+│   └── routes/            # API route definitions
+│       ├── index.ts
+│       └── v1.ts
+├── prisma/
+│   ├── schemas/           # Prisma database schemas
+│   │   ├── schema.prisma
+│   │   └── user.prisma
+│   └── seeders/           # Database seeding scripts
+│       └── index.ts
+├── types/                 # TypeScript type definitions
+│   └── fastify.d.ts
+└── index.ts              # Application entry point
 ```
 
 ## Contributing
@@ -123,39 +166,59 @@ We welcome contributions from the community! Please read our [Contributing Guide
 
 ## API Documentation
 
+### Authentication Endpoints
+
+```http
+POST /api/v1/auth/google
+POST /api/v1/auth/apple
+POST /api/v1/auth/refresh
+DELETE /api/v1/auth/logout
+```
+
 ### Campaign Endpoints
 
 ```http
-GET /api/campaigns
-POST /api/campaigns
-GET /api/campaigns/:id
-PUT /api/campaigns/:id
-DELETE /api/campaigns/:id
+GET /api/v1/campaigns
+POST /api/v1/campaigns
+GET /api/v1/campaigns/:id
+PUT /api/v1/campaigns/:id
+DELETE /api/v1/campaigns/:id
 ```
 
 ### User Endpoints
 
 ```http
-GET /api/users/profile
-PUT /api/users/profile
-GET /api/users/earnings
-POST /api/users/connect-social
+GET /api/v1/users/profile
+PUT /api/v1/users/profile
+GET /api/v1/users/earnings
+POST /api/v1/users/connect-social
 ```
 
 ### Engagement Endpoints
 
 ```http
-POST /api/engagement/verify
-GET /api/engagement/stats
-POST /api/engagement/claim-rewards
+POST /api/v1/engagement/verify
+GET /api/v1/engagement/stats
+POST /api/v1/engagement/claim-rewards
 ```
+
+## Database Schema
+
+The application uses Prisma ORM with PostgreSQL. Key models include:
+
+- **User**: User profiles and authentication data
+- **Campaign**: Social media campaigns with requirements and rewards
+- **Engagement**: User interactions and campaign participation
+- **SocialAccount**: Linked social media accounts
+
+Run `npx prisma studio` to explore the database schema visually.
 
 ## Security
 
 - OAuth 2.0 authentication with Google and Apple
 - JWT tokens for secure API access
-- Data encryption for sensitive information
-- Input validation and sanitization using schemas
+- Data encryption for sensitive information using encryption utilities
+- Input validation and sanitization using schema validation
 - Rate limiting and request throttling
 - Secure database connections with Prisma
 
@@ -192,7 +255,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Social media platforms for API access
 - Open source community for various tools and libraries
 - Beta testers and early adopters
-
----
-
-**Disclaimer**: Cryptocurrency rewards are subject to market volatility. Please participate responsibly and understand the risks involved in crypto trading.
