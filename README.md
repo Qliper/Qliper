@@ -1,7 +1,5 @@
 # Qliper.tv
 
-![Qliper Banner](https://via.placeholder.com/1200x300/6366F1/FFFFFF?text=Qliper.tv)
-
 ## Overview
 
 Qliper.tv is a decentralized social media campaign platform that rewards users with SOL cryptocurrency for authentic engagement across major social media platforms including TikTok, X (Twitter), YouTube, and Instagram.
