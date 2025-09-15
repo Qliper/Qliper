@@ -1,4 +1,6 @@
-# Qliper.tv
+<img width="100" height="100" alt="qliper" src="https://github.com/user-attachments/assets/bcc5967e-5057-42af-9144-9987b65dd8e6" />
+
+# Qliper
 
 ## Overview
 
